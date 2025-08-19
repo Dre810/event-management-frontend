@@ -1,21 +1,68 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Auth from './pages/Auth.js';
-import Dashboard from './pages/Dashboard.js';
-import Events from './pages/Events.js';
-import CreateEvent from './components/CreateEvent.js';
-import EventsList from './components/EventsList.js';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-function App() {
+import Login from './pages/Login';
+import AdminDashboard from './pages/AdminDashboard';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import UserTickets from './pages/UserTickets';
+import Navbar from './components/Navbar';
+
+// ProtectedRoute component to restrict access by role
+function ProtectedRoute({ children, allowedRoles }) {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+}
+
+function AppRoutes() {
+  const { user } = useAuth();
+
+  // If user is logged in, redirect from "/" to their dashboard
   return (
     <Routes>
-      <Route path="/" element={<Auth />} />
-      <Route path="/events" element={<Events />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/create-event" element={<CreateEvent />} />
-      <Route path="/events-list" element={<EventsList />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={
+        user ? (
+          user.role === 'admin' ? <Navigate to="/admin" /> :
+          user.role === 'employee' ? <Navigate to="/employee" /> :
+          <Navigate to="/user" />
+        ) : (
+          <Navigate to="/login" />
+        )
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/employee" element={
+        <ProtectedRoute allowedRoles={['employee']}>
+          <EmployeeDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/user" element={
+        <ProtectedRoute allowedRoles={['user']}>
+          <UserTickets />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <Navbar />
+      <AppRoutes />
+    </AuthProvider>
+  );
+}

@@ -1,0 +1,38 @@
+.dashboard-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f4f6f8;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-header {
+  border-bottom: 2px solid #00adb5;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: #222831;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.dashboard-role {
+  font-weight: 600;
+  color: #393e46;
+  opacity: 0.7;
+}
+
+.dashboard-main h2 {
+  color: #00adb5;
+  margin-bottom: 10px;
+}
+
+.dashboard-main p {
+  color: #222831;
+  font-size: 16px;
+  line-height: 1.4;
+}

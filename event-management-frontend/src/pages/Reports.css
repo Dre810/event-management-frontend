@@ -1,0 +1,62 @@
+.reports-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.reports-container h1 {
+  text-align: center;
+  color: #00adb5;
+  margin-bottom: 20px;
+}
+
+.report-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.report-actions p {
+  font-weight: 600;
+}
+
+.report-actions button {
+  background-color: #00adb5;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.report-actions button:hover {
+  background-color: #008b94;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.report-table th, .report-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.report-table th {
+  background-color: #f4f6f8;
+  color: #333;
+  font-weight: bold;
+}
+
+.report-table tr:hover {
+  background-color: #f9f9f9;
+}

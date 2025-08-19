@@ -4,53 +4,82 @@ import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [role, setRole] = useState('user'); // Default role
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
-    // Simulate login
-    const userData = { username, role };
-    login(userData);
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Redirect after login
-    if (role === 'admin') {
-      navigate('/admin');
-    } else if (role === 'employee') {
-      navigate('/employee');
-    } else {
-      navigate('/user');
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Login failed');
+      }
+
+      const data = await res.json();
+
+      const { token, user } = data;
+
+      // ✅ Save token to localStorage
+      localStorage.setItem('token', token);
+
+      // ✅ Save user in context
+      login(user); // Example user: { username, email, role }
+
+      // ✅ Redirect based on role
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else if (user.role === 'employee') {
+        navigate('/employee');
+      } else {
+        navigate('/user');
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
     <div className="login-container">
-      <h2>Login to Your Dashboard</h2>
+      <h2>Welcome Back 👋</h2>
+      <p className="subtitle">Login to manage events</p>
+
+      {error && <p className="error-msg">{error}</p>}
+
       <form onSubmit={handleSubmit} className="login-form">
         <label>
-          Username:
+          Email Address
           <input
-            type="text"
+            type="email"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
           />
         </label>
 
         <label>
-          Role:
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="admin">Admin</option>
-            <option value="employee">Employee</option>
-            <option value="user">User</option>
-          </select>
+          Password
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+          />
         </label>
 
-        <button type="submit">Login</button>
+        <button type="submit">Log In</button>
       </form>
     </div>
   );

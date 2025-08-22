@@ -1,78 +1,95 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import './Reports.css';
 
+const dummyReports = [
+  {
+    eventName: 'City Park Concert',
+    date: '2025-09-12',
+    ticketsSold: 89,
+    revenue: 89000,
+  },
+  {
+    eventName: 'Nairobi Food Festival',
+    date: '2025-09-25',
+    ticketsSold: 142,
+    revenue: 142000,
+  },
+  {
+    eventName: 'Kisumu Music Fest',
+    date: '2025-10-05',
+    ticketsSold: 201,
+    revenue: 201000,
+  },
+];
+
 export default function Reports() {
-  const [events, setEvents] = useState([]);
-  const [error, setError] = useState('');
+  const totalRevenue = dummyReports.reduce((sum, r) => sum + r.revenue, 0);
+  const totalTickets = dummyReports.reduce((sum, r) => sum + r.ticketsSold, 0);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const token = localStorage.getItem('token');
+  const handleDownloadPDF = () => {
+  const doc = new jsPDF();
+  doc.text('Event Sales Report', 14, 20);
 
-        const res = await fetch('http://localhost:5000/api/events', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+  const tableData = dummyReports.map((event) => [
+    event.eventName,
+    event.date,
+    event.ticketsSold,
+    `KES ${event.revenue.toLocaleString()}`,
+  ]);
 
-        if (!res.ok) throw new Error('Failed to fetch event data');
-        const data = await res.json();
-        setEvents(data.events || data);
-      } catch (err) {
-        setError(err.message);
-      }
-    }
+  tableData.push([
+    'Total',
+    '',
+    totalTickets,
+    `KES ${totalRevenue.toLocaleString()}`,
+  ]);
 
-    fetchData();
-  }, []);
+  autoTable(doc, {
+    head: [['Event Name', 'Date', 'Tickets Sold', 'Revenue']],
+    body: tableData,
+    startY: 30,
+  });
 
-  const exportToCSV = () => {
-    const headers = ['Title,Date,Location,Price'];
-    const rows = events.map(event =>
-      `${event.title},${new Date(event.date).toLocaleDateString()},${event.location},${event.price}`
-    );
-    const csvContent = headers.concat(rows).join('\n');
+  doc.save('Event_Sales_Report.pdf');
+};
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'event_report.csv';
-    link.click();
-  };
 
   return (
-    <div className="reports-container">
-      <h1>📊 Event Reports</h1>
+    <div className="reports-page">
+      <h1>📊 Event Sales Report</h1>
 
-      {error && <p className="error-msg">{error}</p>}
-
-      <div className="report-actions">
-        <p><strong>Total Events:</strong> {events.length}</p>
-        <button onClick={exportToCSV}>Export as CSV</button>
-      </div>
+      <button className="download-btn" onClick={handleDownloadPDF}>
+        📥 Download PDF
+      </button>
 
       <table className="report-table">
         <thead>
           <tr>
-            <th>Title</th>
+            <th>Event Name</th>
             <th>Date</th>
-            <th>Location</th>
-            <th>Price (KES)</th>
+            <th>Tickets Sold</th>
+            <th>Revenue (KES)</th>
           </tr>
         </thead>
         <tbody>
-          {events.map(event => (
-            <tr key={event._id || event.id}>
-              <td>{event.title}</td>
-              <td>{new Date(event.date).toLocaleDateString()}</td>
-              <td>{event.location}</td>
-              <td>{event.price}</td>
+          {dummyReports.map((event, index) => (
+            <tr key={index}>
+              <td>{event.eventName}</td>
+              <td>{event.date}</td>
+              <td>{event.ticketsSold}</td>
+              <td>{event.revenue.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan="2"><strong>Total</strong></td>
+            <td><strong>{totalTickets}</strong></td>
+            <td><strong>{totalRevenue.toLocaleString()}</strong></td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );

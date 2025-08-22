@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './UserTickets.css';
 
-// Sample events — replace with real data or fetch from backend later
 const events = [
   {
     id: 1,
@@ -66,13 +65,60 @@ const events = [
     location: 'Online',
     price: 3000,
     image: '/images/virsualreality.png',
-  }
+  },
 ];
 
 export default function UserTickets() {
+  const [phone, setPhone] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
+  const [loadingEventId, setLoadingEventId] = useState(null);
+
+  const handleBuyTicket = async (eventId, amount) => {
+    if (!phone || phone.length !== 12 || !phone.startsWith('254')) {
+      setStatusMessage('⚠️ Please enter a valid phone number (e.g. 254712345678)');
+      return;
+    }
+
+    setLoadingEventId(eventId);
+    setStatusMessage('');
+
+    try {
+      const response = await fetch('http://localhost:5000/api/mpesa/pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, amount }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.ResponseCode === '0') {
+        setStatusMessage('✅ Payment request sent! Check your phone to enter PIN.');
+      } else {
+        setStatusMessage('❌ Payment failed. Please try again.');
+        console.error('Payment error:', data);
+      }
+    } catch (error) {
+      console.error('Request error:', error);
+      setStatusMessage('❌ Server error. Please try again later.');
+    } finally {
+      setLoadingEventId(null);
+    }
+  };
+
   return (
     <div className="tickets-container">
       <h1 className="tickets-heading">🎫 Book Your Event Ticket</h1>
+
+      <div className="phone-input-container">
+        <input
+          type="text"
+          className="phone-input"
+          placeholder="Enter your phone number (e.g. 254712345678)"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+      </div>
+
       <div className="tickets-grid">
         {events.map((event) => (
           <div key={event.id} className="ticket-card">
@@ -82,11 +128,23 @@ export default function UserTickets() {
               <p><strong>Date:</strong> {new Date(event.date).toLocaleDateString()}</p>
               <p><strong>Location:</strong> {event.location}</p>
               <p><strong>Price:</strong> KES {event.price}</p>
-              <button className="btn-buy-ticket">Buy Ticket</button>
+              <button
+                className="btn-buy-ticket"
+                onClick={() => handleBuyTicket(event.id, event.price)}
+                disabled={loadingEventId === event.id}
+              >
+                {loadingEventId === event.id ? 'Processing...' : 'Buy Ticket'}
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {statusMessage && (
+        <div className="status-message">
+          <p>{statusMessage}</p>
+        </div>
+      )}
     </div>
   );
 }

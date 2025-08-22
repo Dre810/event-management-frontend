@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
@@ -27,16 +27,12 @@ export default function Login() {
       }
 
       const data = await res.json();
-
       const { token, user } = data;
 
-      // ✅ Save token to localStorage
       localStorage.setItem('token', token);
+      login(user);
 
-      // ✅ Save user in context
-      login(user); // Example user: { username, email, role }
-
-      // ✅ Redirect based on role
+      // Redirect based on role
       if (user.role === 'admin') {
         navigate('/admin');
       } else if (user.role === 'employee') {
@@ -80,6 +76,11 @@ export default function Login() {
         </label>
 
         <button type="submit">Log In</button>
+
+        <div className="login-links">
+          <Link to="/forgot-password" className="link">Forgot Password?</Link>
+          <Link to="/register" className="link">Don't have an account? Register</Link>
+        </div>
       </form>
     </div>
   );

@@ -8,7 +8,10 @@ import EmployeeDashboard from './pages/EmployeeDashboard';
 import UserTickets from './pages/UserTickets';
 import Navbar from './components/Navbar';
 import Reports from './pages/Reports';
-import { AuthProvider } from './context/AuthContext';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import MpesaPayment from './components/MpesaPayment';
 
 // ProtectedRoute component to restrict access by role
 function ProtectedRoute({ children, allowedRoles }) {
@@ -25,21 +28,14 @@ function ProtectedRoute({ children, allowedRoles }) {
   return children;
 }
 
-
-function App() {
-  return (
-    <AuthProvider>
-      {/* your Routes here */}
-    </AuthProvider>
-  );
-}
-
+// AppRoutes handles all the routing logic
 function AppRoutes() {
   const { user } = useAuth();
 
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      
       <Route
         path="/"
         element={
@@ -56,6 +52,7 @@ function AppRoutes() {
           )
         }
       />
+
       <Route
         path="/admin"
         element={
@@ -80,35 +77,37 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-  <Route
-    path="/create-event"
-    element={
-      <ProtectedRoute allowedRoles={['employee']}>
-        <EmployeeDashboard />
-      </ProtectedRoute>
-    }
-  />
-
-  <Route path="/reports" element={
-  <ProtectedRoute allowedRoles={['admin', 'employee']}>
-    <Reports />
-  </ProtectedRoute>
-} />
-
-
-</Routes>
+      <Route
+        path="/create-event"
+        element={
+          <ProtectedRoute allowedRoles={['employee']}>
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'employee']}>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/mpesa-payment" element={<MpesaPayment />} />
+    </Routes>
   );
 }
 
+// ✅ Final App Component
 export default function App() {
   const location = useLocation();
-
-  // Hide Navbar on login page
   const hideNavbarOnPaths = ['/login'];
 
   return (
     <AuthProvider>
-      {/* Show Navbar only if NOT on login page */}
       {!hideNavbarOnPaths.includes(location.pathname) && <Navbar />}
       <AppRoutes />
     </AuthProvider>

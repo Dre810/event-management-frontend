@@ -66,3 +66,25 @@
 .btn-buy-ticket:hover {
   background-color: #008b94;
 }
+.phone-input-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.phone-input {
+  padding: 10px;
+  width: 300px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.status-message {
+  text-align: center;
+  font-weight: bold;
+  color: #444;
+  margin-top: 20px;
+}
+.status-message.success {
+  color: green;
+}

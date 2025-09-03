@@ -96,3 +96,40 @@ header p {
 .event-card:hover {
   transform: translateY(-4px);
 }
+
+.create-event-form {
+  margin-top: 40px;
+  background: #f7f7f7;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.create-event-form h2 {
+  margin-bottom: 15px;
+}
+
+.create-event-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-event-form input {
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.create-event-form button {
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.status-message {
+  margin-top: 10px;
+  font-weight: bold;
+}
